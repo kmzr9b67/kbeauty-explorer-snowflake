@@ -1,0 +1,20 @@
+[project]
+name = "kbeauty-explorer-snowflake"
+version = "0.1.0"
+description = "K-Beauty product explorer"
+authors = [
+    {name = "kmzr9b67",email = "kmzr9b67@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "streamlit (>=1.52.2,<2.0.0)",
+    "sqlalchemy (>=2.0.45,<3.0.0)",
+    "snowflake-sqlalchemy (>=1.8.2,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
