@@ -259,6 +259,20 @@ doc = ["sphinx (>=7.1.2,<7.2)", "sphinx-autodoc-typehints", "sphinx_rtd_theme"]
 test = ["coverage[toml]", "ddt (>=1.1.1,!=1.4.3)", "mock ; python_version < \"3.8\"", "mypy (==1.18.2) ; python_version >= \"3.9\"", "pre-commit", "pytest (>=7.3.1)", "pytest-cov", "pytest-instafail", "pytest-mock", "pytest-sugar", "typing-extensions ; python_version < \"3.11\""]
 
 [[package]]
+name = "google-search-results"
+version = "2.4.2"
+description = "Scrape and search localized results from Google, Bing, Baidu, Yahoo, Yandex, Ebay, Homedepot, youtube at scale using SerpApi.com"
+optional = false
+python-versions = ">=3.5"
+groups = ["main"]
+files = [
+    {file = "google_search_results-2.4.2.tar.gz", hash = "sha256:603a30ecae2af8e600b22635757a6df275dad4b934f975e67878ccd640b78245"},
+]
+
+[package.dependencies]
+requests = "*"
+
+[[package]]
 name = "greenlet"
 version = "3.3.0"
 description = "Lightweight in-process concurrent programming"
@@ -1182,6 +1196,25 @@ files = [
 ]
 
 [[package]]
+name = "serpapi"
+version = "0.1.5"
+description = "The official Python client for SerpApi.com."
+optional = false
+python-versions = ">=3.6.0"
+groups = ["main"]
+files = [
+    {file = "serpapi-0.1.5-py2.py3-none-any.whl", hash = "sha256:6467b6adec1231059f754ccaa952b229efeaa8b9cae6e71f879703ec9e5bb3d1"},
+    {file = "serpapi-0.1.5.tar.gz", hash = "sha256:b9707ed54750fdd2f62dc3a17c6a3fb7fa421dc37902fd65b2263c0ac765a1a5"},
+]
+
+[package.dependencies]
+requests = "*"
+
+[package.extras]
+color = ["pygments"]
+test = ["pytest"]
+
+[[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1450,4 +1483,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "3aa8cb2d4e458428a4bffdb565e98daad09abdd06481bb16c6411dfb11e808e3"
+content-hash = "b0516efc361d367421de4ac03e030a1498846ecfdaeb2f7db65ccf47c4dac13a"
