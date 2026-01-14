@@ -1,59 +1,81 @@
+import yaml
+
 import streamlit as st
+import pandas as pd
 
-# 1. Konfiguracja strony na tryb szeroki (niezbędne dla 5 kolumn)
-st.set_page_config(page_title="K-Beauty Advisor", page_icon="✨", layout="wide")
+from k_beauty_app.database import DataBase
+from k_beauty_app.models import AgeRanges, SkinType, Concerns
 
-st.title("✨ K-Beauty Personalized Advisor")
-st.markdown("---")
+st.set_page_config(page_title="K-Beauty Explorer", page_icon="✨", layout="centered")
 
-# Sekcja filtrów
-col_age, col_skin, col_concern = st.columns(3)
+db = DataBase.get_instance()
+age_keys = db.get_keys(AgeRanges)
+skin_type_keys = db.get_keys(SkinType)
+concern_keys = db.get_keys(Concerns)
 
-with col_age:
-    age = st.selectbox("Your Age Group", ["Under 20", "20-30", "30-50", "50+"])
-with col_skin:
-    skin_type = st.selectbox("Skin Type", ["Oily", "Dry", "Combination", "Sensitive"])
-with col_concern:
-    concern = st.selectbox("What to improve?", ["Hydration", "Acne", "Anti-aging", "Glow"])
 
-st.markdown(" ")
+if 'form_page' not in st.session_state:
+    st.session_state.form_page = True
 
-# Przycisk generowania wynikow
-if st.button('Generate My Routine', use_container_width=True):
+if st.session_state.form_page:
+    with st.container(horizontal_alignment="center", vertical_alignment="center"):
+        st.space(size = "medium")
+        st.header("K-Beauty Advisor", text_alignment = "center", width = "stretch")
+        st.space(size = "small")
+        col1, col2, col3, col4 = st.columns(width = "stretch", vertical_alignment = "bottom", spec = [0.3, 0.3, 0.3, 0.1])
+        
+        with col1:
+            age = st.selectbox(label = "Your Age Group", options = list(age_keys), label_visibility="visible")
+        with col2:
+            skin_type = st.selectbox(label = "Skin Type",options = list(skin_type_keys), label_visibility="visible")
+        with col3:
+            concern = st.selectbox(label = "Primary Skin Concern", options = list(concern_keys), label_visibility="visible")
+        with col4:
+            
+            if st.button(width="content", label = "->", type = "primary"):
+                st.session_state.results = db.get_recommendations(age_val = age, skin_val = skin_type, concern_val = concern)
+                st.session_state.form_page = False
+                st.rerun()
+        st.space(size = "medium")
+        with st.container(horizontal_alignment= "center"):
+            st.text("The results will be with you in 5-10 secends.")
+        st.space(size = "medium")
+
+
+else:
+    with open('config.yaml', 'r', encoding='utf-8') as file:
+        routine_info = yaml.safe_load(file)['steps']
+
+    results = st.session_state.results
+    st.header("YOUR PERSONALIZED ROUTINE")
     st.divider()
-    st.subheader(f"✨ Your Custom 5-Step Routine for {skin_type} & Skin {concern}")
-    st.markdown(" ")
 
-    # 2. Definicja kroków rutyny (UX: Jasne etykiety i ikony)
-    routine_steps = [
-        {"step": "STEP 1", "label": "OIL CLEANSER", "icon": "🧼"},
-        {"step": "STEP 2", "label": "WATER CLEANSE", "icon": "🌊"},
-        {"step": "STEP 3", "label": "TONER", "icon": "💧"},
-        {"step": "STEP 4", "label": "SERUM", "icon": "🧪"},
-        {"step": "STEP 5", "label": "PROTECT (SPF)", "icon": "☀️"}
-    ]
+    table_data = {
+        "Step": [],
+        "Routine": [],
+        "Product": [],
+        "Brand": [],
+        "Rating": [],
+    }
 
-    # 3. Tworzenie 5 kolumn z równym odstępem (gap)
-    cols = st.columns(5, gap="medium")
-    
-    #  SQL Query - should be here. 
-    for i, col in enumerate(cols):
-        with col:
-            # Użycie kontenera z obramowaniem tworzy estetyczną kartę produktu
-            with st.container(border=True):
-                # Nagłówek kroku
-                st.caption(f"{routine_steps[i]['step']}: {routine_steps[i]['label']}")
-                
-                # Optional TODO 
-                # # Placeholder na zdjęcie produktu
-                # st.image(f"", use_container_width=True)
-                
-                # Nazwa produktu (Tu trafią dane ze Snowflake)
-                st.markdown(f"**{routine_steps[i]['icon']} Best-Seller {routine_steps[i]['label'].capitalize()}**")
-                
-                # Rating - TODO it should be dynamic. 
-                st.caption("Rating: ⭐⭐⭐⭐⭐ (4.9)")
-                
-                # Optional TODO 
-                # # Przycisk akcji dla konkretnego produktu
-                # st.button("View Details", key=f"btn_{i}", use_container_width=True)
+    for i, res in enumerate(results):
+        table_data["Step"].append(f"STEP {i+1}")
+        table_data["Routine"].append(f"{routine_info[i]['icon']} {routine_info[i]['name']}")
+        table_data["Product"].append(res["product_name"])
+        table_data["Brand"].append(res["brand"])
+        
+
+        rating = float(res["rating"])
+        stars = "⭐" * int(round(rating))
+        table_data["Rating"].append(f"{stars}")
+
+    df = pd.DataFrame(table_data)
+    st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True
+    )
+    _, col1, _ = st.columns([0.45, 0.1, 0.45], gap="small", width="stretch", vertical_alignment="top")
+    if col1.button( label = "<-", type = "primary", use_container_width=True):
+        st.session_state.form_page = True
+        st.rerun()

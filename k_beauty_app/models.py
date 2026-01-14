@@ -1,7 +1,10 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import String, Integer, Float
+from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
+from sqlalchemy import String, Integer, Float, ForeignKey
 
-class Age_Ranges(DeclarativeBase):
+class Base(DeclarativeBase):
+    pass
+
+class AgeRanges(Base):
     __tablename__ = "AGE_RANGES"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -10,7 +13,7 @@ class Age_Ranges(DeclarativeBase):
     def __repr__(self) -> str:
         return f"Product(id={self.id}, name='{self.name}')"
 
-class Skin_Type(DeclarativeBase):
+class SkinType(Base):
     __tablename__ = "SKIN_TYPES"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -20,7 +23,7 @@ class Skin_Type(DeclarativeBase):
     def __repr__(self) -> str:
         return f"Skin_Type(id={self.id}, name='{self.name}', advice = '{self.advice}')"
 
-class Concerns(DeclarativeBase):
+class Concerns(Base):
     __tablename__ = "CONCERNS"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -29,7 +32,7 @@ class Concerns(DeclarativeBase):
     def __repr__(self) -> str:
         return f"Skin_Type(id={self.id}, name='{self.name}')"
 
-class Runtime_Steps(DeclarativeBase):
+class RuntimeSteps(Base):
     __tablename__ = "ROUTINE_STEPS"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -39,17 +42,22 @@ class Runtime_Steps(DeclarativeBase):
     def __repr__(self) -> str:
         return f"Skin_Type(id={self.id}, name='{self.name}', sequence = '{self.sequence})"
     
-class Products(DeclarativeBase):
+class Products(Base):
     __tablename__ = "PRODUCTS"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     brand: Mapped[str] = mapped_column(String(100))
-    rating: Mapped[int] = mapped_column(Float)
-    skin_type_id: Mapped[int] = mapped_column(Integer)
-    concern_id: Mapped[int] = mapped_column(Integer)
-    age_range_id: Mapped[int] = mapped_column(Integer)
-    step_id: Mapped[int] = mapped_column(Integer)
+    rating: Mapped[float] = mapped_column(Float)
+    image_url: Mapped[str] = mapped_column(String(500))
+    
+    skin_type_id: Mapped[int] = mapped_column(ForeignKey("SKIN_TYPES.id"))
+    concern_id: Mapped[int] = mapped_column(ForeignKey("CONCERNS.id"))
+    age_range_id: Mapped[int] = mapped_column(ForeignKey("AGE_RANGES.id"))
+    step_id: Mapped[int] = mapped_column(ForeignKey("ROUTINE_STEPS.id"))
+
+    step: Mapped["RuntimeSteps"] = relationship()
+    skin_type: Mapped["SkinType"] = relationship()
 
     def __repr__(self) -> str:
         return f"Skin_Type(id={self.id}, name='{self.name}',brand='{self.brand}',rating='{self.rating}', skin_type_id='{self.skin_type_id}')"
