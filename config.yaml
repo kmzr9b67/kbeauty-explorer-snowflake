@@ -1,0 +1,11 @@
+steps:
+  - icon: "🧼"
+    name: "OIL CLEANSER"
+  - icon: "🌊"
+    name: "WATER CLEANSER"
+  - icon: "💧"
+    name: "TONER"
+  - icon: "🧪"
+    name: "SERUM"
+  - icon: "☀️"
+    name: "SPF"
