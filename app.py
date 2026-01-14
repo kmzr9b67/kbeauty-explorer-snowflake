@@ -44,7 +44,7 @@ if st.session_state.form_page:
 
 else:
     results = st.session_state.results
-    if results != None:
+    if results == None:
         st.header("✨ No Match Found", text_alignment="center")
         st.space("small")
         st.markdown("**We couldn't find a perfect routine for this specific combination.**", text_alignment= "center")
