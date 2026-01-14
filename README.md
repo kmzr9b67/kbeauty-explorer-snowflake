@@ -6,19 +6,19 @@
 
 The app connects to a **Snowflake** cloud data warehouse and uses **SQLAlchemy ORM** to match products to user profiles.
 
-## 🚀 Features
+## Features
 - **Personalization:** Product selection based on age, skin type, and primary concerns.
 - **Intelligent Search:** Advanced SQL queries using JOINs across multiple reference tables.
 - **Dynamic UI:** Clean results presentation with a visual rating system (stars ⭐).
 - **Performance Optimization:** Implemented Singleton pattern and connection caching.
 
-## 🛠️ Tech Stack
+## Tech Stack
 - **Frontend:** [Streamlit](https://streamlit.io/)
 - **Backend/ORM:** [SQLAlchemy](https://www.sqlalchemy.org/)
 - **Database:** [Snowflake](https://www.snowflake.com/)
 - **Language:** Python 3.11
 
-## 📁 Project Structure
+## Project Structure
 ```text
 .
 ├── k_beauty_app/
@@ -30,7 +30,7 @@ The app connects to a **Snowflake** cloud data warehouse and uses **SQLAlchemy O
 │   └── secrets.toml   
 └── README.md 
 ```      
-## ⚙️ Local Setup (using Poetry)
+## Local Setup (using Poetry)
 
 1. **Clone the repository:**
    ```bash
@@ -40,7 +40,7 @@ The app connects to a **Snowflake** cloud data warehouse and uses **SQLAlchemy O
    ```bash
    cd k-beauty-orm-manager
    ```
-## 🚀 How to Run the Application
+## How to Run the Application
 
 This project uses **Poetry** for dependency management. To run the Streamlit dashboard, follow these steps:
 
