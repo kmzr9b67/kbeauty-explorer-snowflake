@@ -67,14 +67,12 @@ else:
     results = st.session_state.results
 
     if not results or results == [{}]:
-        st.header("✨ No Match Found", text_alignment="center")
+        st.header("✨ No Match Found", text_alignment="left")
         st.space("small")
         st.markdown(
             "**We couldn't find a perfect routine for this specific combination.**"
         )
-        st.space("small")
         st.divider()
-
         st.link_button(
             "Contact us",
             url="https://github.com/kmzr9b67/kbeauty-explorer-snowflake/issues/new",
@@ -84,7 +82,6 @@ else:
     else:
         with open("config.yaml", encoding="utf-8") as file:
             routine_info = yaml.safe_load(file)["steps"]
-
         st.header("YOUR PERSONALIZED ROUTINE")
         st.divider()
 
