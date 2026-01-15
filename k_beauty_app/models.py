@@ -57,6 +57,8 @@ class Products(Base):
 
     step: Mapped["RuntimeSteps"] = relationship()
     skin_type: Mapped["SkinType"] = relationship()
+    concern: Mapped["Concerns"] = relationship()
+    age_range: Mapped["AgeRanges"] = relationship()
 
     def __repr__(self) -> str:
         return f"Skin_Type(id={self.id}, name='{self.name}',brand='{self.brand}',rating='{self.rating}', skin_type_id='{self.skin_type_id}')"
