@@ -1,10 +1,11 @@
+import os 
 import streamlit as st
 
 from snowflake.sqlalchemy import URL
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import select, create_engine
+from sqlalchemy import select, create_engine, text
 from k_beauty_app.models import Products, AgeRanges, SkinType, Concerns
-
+from k_beauty_app.validation import validate_db_tables
 
 class DataBase:
     """Handles connection and operations with the Snowflake database.
@@ -17,7 +18,7 @@ class DataBase:
         SessionLocal: Session factory for creating new database sessions.
     """
     def __init__(self) -> None:
-        engine = create_engine(URL(
+        self.engine = create_engine(URL(
             account = st.secrets["snowflake"]["account"],
             user = st.secrets["snowflake"]["user"],
             password = st.secrets["snowflake"]["password"],
@@ -26,9 +27,9 @@ class DataBase:
             database = st.secrets["snowflake"]["database"],
             schema = st.secrets["snowflake"]["schema"]
             ))
-        self.session = sessionmaker(bind=engine)()
+        self.session = sessionmaker(bind=self.engine)()
 
-
+    @validate_db_tables
     def get_recommendations(self, age_val: str, skin_val: str, concern_val: str):
         """Fetches a list of recommended products based on user criteria.
 
@@ -55,7 +56,7 @@ class DataBase:
                     SkinType.name == skin_val,
                     Concerns.name == concern_val
                 )
-                .order_by(Products.step_id, Products.rating.desc()).limit(1)
+                .order_by(Products.step_id, Products.rating.desc()).limit(5)
             )
         results = session.execute(stmt).scalars().all()
         return [
@@ -64,10 +65,9 @@ class DataBase:
                 "brand": p.brand,
                 "product_name": p.name,
                 "rating": p.rating,
-                "url": p.image_url,
             } for p in results
         ]
-
+    @validate_db_tables
     def get_keys(self, table_name):
         """Retrieves a list of unique names from a specific reference table.
 
@@ -86,6 +86,64 @@ class DataBase:
                 select(table_name.name).distinct()
             )
         return session.execute(stmt).scalars().all()
+    
+    def populate_database(self) -> bool:
+        """Orchestrates the complete database initialization and seeding process.
+
+        Sequentially executes a series of SQL scripts to set up the database schema, 
+        populate reference tables (dictionaries), and generate the product 
+        recommendation matrix. The order of execution is critical to maintain 
+        referential integrity (Foreign Key constraints).
+
+        Execution Order:
+            1. 01_schema.sql: Creates tables and relationships.
+            2. 02_dictionaries.sql: Inserts static data (Skin Types, Concerns, etc.).
+            3. 03_products_data.sql: Generates the product mapping using logic.
+
+        Returns:
+            bool: True if all scripts were executed successfully in the correct order, 
+                False if any script execution failed.
+        """
+        files = [
+            'sql_scripts/01_schema.sql',
+            'sql_scripts/02_dictionaries.sql',
+            'sql_scripts/03_products_data.sql'
+        ]
+        
+        for file in files:
+            if not self.run_sql_file(file):
+                return False
+        return True
+
+    def run_sql_file(self, file_path: str) -> bool:
+        """Reads and executes a SQL file containing multiple commands.
+
+        This method parses a file, splits its content by semicolons into individual 
+        statements, and executes them sequentially within a single database connection. 
+        It is primarily used for database schema initialization and data seeding.
+
+        Args:
+            file_path (str): The relative or absolute path to the .sql file to be executed.
+
+        Returns:
+            bool: True if all commands were executed successfully, False if the file 
+                does not exist or a database error occurred during execution.
+        """
+        if not os.path.exists(file_path):
+            return False
+            
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            commands = [c.strip() for c in content.split(';') if c.strip()]
+            
+        try:
+            with self.engine.connect() as conn:
+                for command in commands:
+                    conn.execute(text(command))
+                conn.commit()
+            return True
+        except Exception as e:
+            return False
     
     @staticmethod
     @st.cache_resource
