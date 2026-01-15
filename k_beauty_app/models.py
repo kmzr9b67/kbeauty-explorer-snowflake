@@ -49,8 +49,7 @@ class Products(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     brand: Mapped[str] = mapped_column(String(100))
     rating: Mapped[float] = mapped_column(Float)
-    image_url: Mapped[str] = mapped_column(String(500))
-    
+
     skin_type_id: Mapped[int] = mapped_column(ForeignKey("SKIN_TYPES.id"))
     concern_id: Mapped[int] = mapped_column(ForeignKey("CONCERNS.id"))
     age_range_id: Mapped[int] = mapped_column(ForeignKey("AGE_RANGES.id"))
