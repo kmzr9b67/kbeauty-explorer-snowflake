@@ -73,11 +73,9 @@ if st.session_state.form_page:
 
     with col4:
         # Primary button triggers the submit_form callback with user inputs
-        try:
-            st.button("→",type="primary",on_click=submit_form,args=(age, skin_type, concern),
-                use_container_width=True
-            )
-        except 
+        st.button("→",type="primary",on_click=submit_form,args=(age, skin_type, concern),
+            use_container_width=True
+        )
 
     st.space(size = "medium")
     with st.container(horizontal_alignment= "center"):
